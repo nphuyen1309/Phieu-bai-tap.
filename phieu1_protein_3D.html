@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phiếu 1 – Protein (mô phỏng 3D)</title>
+<style>
+:root{--bg:#f5f7fb;--c:#fff;--t:#1d2433;--m:#5b667a;--p:#3b5bdb;--ok:#e6f6ea;--no:#fdeaea;--b:#d9dfeb}
+@media(prefers-color-scheme:dark){:root{--bg:#141821;--c:#1e2430;--t:#e8ecf5;--m:#9aa6bd;--p:#7c96ff;--ok:#1d3a26;--no:#4a2326;--b:#323b4d}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.55 system-ui,"Segoe UI",sans-serif}
+.w{max-width:860px;margin:auto;padding:14px}h1{font-size:1.3rem;margin:6px 0}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:14px;margin:12px 0}
+.card h3{margin:0 0 6px;font-size:1.02rem;color:var(--p)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center}
+button{padding:9px 14px;border:1px solid var(--b);background:var(--c);color:var(--t);border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+button.on,.pri{background:var(--p);color:#fff;border-color:var(--p)}
+.tabs button{flex:1;padding:12px}
+canvas{width:100%;height:340px;display:block;border-radius:10px;cursor:grab;touch-action:none}
+.hint{font-size:.82rem;color:var(--m);margin:4px 0}
+.cap{padding:8px 12px;background:var(--bg);border-left:4px solid var(--p);border-radius:6px;margin-top:8px;font-size:.95rem}
+.def{background:var(--bg);padding:10px 12px;border-radius:8px;margin:6px 0}
+input[type=text],textarea{width:100%;padding:8px;border:1px solid var(--b);border-radius:8px;background:var(--bg);color:var(--t);font:inherit}
+input[type=range]{width:100%}
+.q p{margin:0 0 6px;font-weight:600}.q label{display:block;padding:6px 10px;border:1px solid var(--b);border-radius:8px;margin:4px 0;cursor:pointer}
+.q label.ok{background:var(--ok);border-color:#2b8a3e}.q label.no{background:var(--no);border-color:#c92a2a}
+.ex{display:none;margin-top:6px;font-size:.92rem;color:var(--m)}.done .ex{display:block}
+.hid{display:none}
+.sim2{background:#f8f9fa;border:1px solid var(--b);border-radius:10px;color:#222}.sim2 svg{width:100%;display:block}
+input.blank{display:inline-block;width:120px!important;padding:2px 6px;border:0;border-bottom:2px solid var(--p);border-radius:0;text-align:center;font-weight:600}
+input.blank.ok{background:var(--ok);border-color:#2b8a3e}input.blank.no{background:var(--no);border-color:#c92a2a}
+.bank{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.bank span{padding:3px 10px;border:1px dashed var(--p);border-radius:999px;font-size:.9rem}
+.fb{line-height:2.4}
+</style></head><body><div class="w">
+<h1>🧬 Phiếu học tập số 1 – Protein</h1>
+<div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input type="text" id="hn" placeholder="Họ và tên"><input type="text" id="lp" placeholder="Lớp – Nhóm"></div>
+<div class="row tabs"><button id="t0" class="on" onclick="tab(0)">Phần 1: Khái niệm & cấu tạo</button><button id="t1" onclick="tab(1)">Phần 2: Tính chất vật lí</button></div>
+
+<div id="P0">
+<div class="card"><h3>1. Khám phá bằng mô hình 3D: protein được tạo thành như thế nào?</h3>
+<p><b>Nhiệm vụ:</b> bấm “+ 1 amino acid” nhiều lần và quan sát (xoay, zoom để nhìn rõ từng nguyên tử):<br>
+① Các amino acid nối với nhau bằng liên kết nào (giữa nguyên tử nào với nguyên tử nào)?<br>
+② Mỗi lần nối thêm một amino acid thì tách ra phân tử nào?<br>
+③ Chuỗi có n gốc amino acid thì có bao nhiêu liên kết peptide?<br>
+④ Bấm “Thêm nhóm heme”: nhóm này có phải amino acid không? Protein khi đó gọi là gì?<br>
+Sau đó dùng kết quả quan sát để điền vào đoạn khái niệm bên dưới.</p>
+<div class="hint"><span style="color:#4dabf7">●</span> N &nbsp; <span style="color:#adb5bd">●</span> C &nbsp; <span style="color:#ff6b6b">●</span> O &nbsp; <span style="color:#dee2e6">●</span> H &nbsp; ● nhóm R (mỗi amino acid một màu)</div>
+<canvas id="c0"></canvas><div class="hint">👆 Kéo để xoay · cuộn chuột / chụm hai ngón để zoom</div>
+<div class="row"><button class="pri" onclick="addAA()">+ 1 amino acid</button><button onclick="rst();cap0()">↺ Làm lại</button><button onclick="heme=!heme;cap0()">🩸 Thêm / bỏ nhóm heme</button></div>
+<div data-t="V0"></div><div class="cap" id="cap0"></div></div>
+
+<div class="card"><h3>✍️ Từ mô phỏng, em hãy rút ra khái niệm protein và điền vào chỗ trống</h3>
+<div class="bank" id="bank"></div>
+<div class="fb" id="fb"></div>
+<div class="row"><button class="pri" onclick="chkFb()">Kiểm tra</button><button onclick="showFb()">Hiện đáp án</button><button onclick="mkFb()">Làm lại</button></div><b id="fbs"></b></div>
+
+<div class="card"><h3>2. Cấu tạo – mô hình 3D bốn bậc cấu trúc</h3>
+<p><b>Nhiệm vụ:</b> bấm lần lượt Bậc 1 → 4; dùng ngón tay/chuột xoay mô hình, chụm hoặc cuộn để phóng to, quan sát các đường nét đứt.</p>
+<div class="row" id="lvb"></div><canvas id="c1"></canvas><div class="hint">👆 Kéo để xoay · cuộn chuột / chụm hai ngón để zoom</div><div data-t="V1"></div>
+<div class="cap" id="cap1"></div></div>
+
+<div class="card"><h3>📝 Câu hỏi phần 1</h3><div id="qs0"></div><div class="row"><button class="pri" onclick="grade(0)">Nộp phần 1</button></div><b id="sc0"></b></div></div>
+
+<div id="P1" class="hid">
+<div class="card"><h3>1. Hình dạng phân tử và độ tan</h3>
+<p><b>Nhiệm vụ:</b> chuyển qua lại giữa hai dạng, xoay và zoom để so sánh hình dạng, rồi trả lời câu hỏi.</p>
+<div class="row"><button id="m0" class="on" onclick="mode(0)">Dạng sợi (keratin, collagen)</button><button id="m1" onclick="mode(1)">Dạng cầu (albumin, hemoglobin)</button></div>
+<canvas id="c3"></canvas><div class="hint">👆 Kéo để xoay · cuộn / chụm để zoom</div><div data-t="V3"></div><div class="cap" id="cap3"></div></div>
+
+<div class="card"><h3>2. Sự đông tụ protein</h3>
+<p><b>Nhiệm vụ:</b> kéo thanh nhiệt độ hoặc thêm tác nhân vào dung dịch (mỗi “quả cầu” gồm 8 gốc amino acid). Sau đó kéo nhiệt độ về 20 °C và nhận xét.</p>
+<canvas id="c2"></canvas><div class="hint">👆 Kéo để xoay · cuộn / chụm để zoom</div><div data-t="V2"></div>
+<p style="margin:6px 0 0">Nhiệt độ: <b id="tv">20</b> °C</p><input type="range" id="tr" min="20" max="100" value="20">
+<div class="row"><button onclick="ag('HCl')">+ HCl</button><button onclick="ag('Cu')">+ CuSO₄ (kim loại nặng)</button><button onclick="ag('H2O')">+ Nước cất</button><button onclick="rs2()">Làm mới</button></div>
+<div class="cap" id="cap2"></div></div>
+
+<div class="card"><h3>📝 Câu hỏi phần 2</h3><div id="qs1"></div><div class="row"><button class="pri" onclick="grade(1)">Nộp phần 2</button><button onclick="location.reload()">Làm lại</button><button onclick="print()">In / Lưu PDF</button></div><b id="sc1"></b></div></div>
+</div>
+<script>
+// ===== ENGINE 3D (xoay, zoom) =====
+function cl(z){return Math.max(.4,Math.min(4,z))}
+function View(id,gen,auto){
+ var cv=document.getElementById(id),cx=cv.getContext('2d'),v={yaw:.5,pitch:.35,zoom:1,auto:auto},ps={};
+ function rs(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;v.w=r.width;v.h=r.height;v.d=d}
+ function pr(x,y,z){var a=Math.cos(v.yaw),b=Math.sin(v.yaw),c=Math.cos(v.pitch),s=Math.sin(v.pitch),X=x*a+z*b,Z=-x*b+z*a,Y=y*c-Z*s;Z=y*s+Z*c;
+  var f=500/(500+Z),k=v.zoom*f*Math.min(v.w,v.h)/300;return[v.w/2+X*k,v.h/2+Y*k,Z,k]}
+ function draw(t){if(!v.w)rs();if(!v.w)return;var g=gen(t);cx.setTransform(v.d,0,0,v.d,0,0);cx.fillStyle='#1e2a3a';cx.fillRect(0,0,v.w,v.h);
+  (g.e||[]).forEach(function(e){var a=pr(e[0],e[1],e[2]),b=pr(e[3],e[4],e[5]);cx.strokeStyle='rgba(255,255,255,.25)';cx.lineWidth=1;cx.beginPath();cx.moveTo(a[0],a[1]);cx.lineTo(b[0],b[1]);cx.stroke()});
+  g.b.forEach(function(q){q.p=pr(q.x,q.y,q.z)});
+  (g.l||[]).forEach(function(l){var a=g.b[l[0]],b=g.b[l[1]],al=Math.min(a.a,b.a);if(al<.05)return;cx.globalAlpha=al;cx.strokeStyle=l[2];cx.lineWidth=l[4]||(l[3]?2:3);cx.setLineDash(l[3]?[5,4]:[]);cx.beginPath();cx.moveTo(a.p[0],a.p[1]);cx.lineTo(b.p[0],b.p[1]);cx.stroke()});
+  cx.setLineDash([]);
+  g.b.slice().sort(function(a,b){return b.p[2]-a.p[2]}).forEach(function(q){if(q.a<.05)return;var r=q.r*q.p[3];cx.globalAlpha=q.a;cx.fillStyle=q.c;cx.beginPath();cx.arc(q.p[0],q.p[1],r,0,7);cx.fill();cx.fillStyle='rgba(255,255,255,.4)';cx.beginPath();cx.arc(q.p[0]-r*.3,q.p[1]-r*.3,r*.35,0,7);cx.fill()});cx.globalAlpha=1;(g.tx||[]).forEach(function(q){var p=pr(q[0],q[1],q[2]);cx.font='bold '+Math.max(9,11*p[3])+'px system-ui,sans-serif';cx.textAlign='center';cx.fillStyle=q[4];cx.fillText(q[3],p[0],p[1])})}
+ cv.onpointerdown=function(e){cv.setPointerCapture(e.pointerId);ps[e.pointerId]=[e.clientX,e.clientY]};
+ cv.onpointerup=cv.onpointercancel=function(e){delete ps[e.pointerId]};
+ cv.onpointermove=function(e){var o=ps[e.pointerId];if(!o)return;var ids=Object.keys(ps);
+  if(ids.length==1){v.yaw+=(e.clientX-o[0])*.01;v.pitch=Math.max(-1.5,Math.min(1.5,v.pitch+(e.clientY-o[1])*.01))}
+  else{var q=ps[ids[0]==e.pointerId?ids[1]:ids[0]],d0=Math.hypot(o[0]-q[0],o[1]-q[1]),d1=Math.hypot(e.clientX-q[0],e.clientY-q[1]);if(d0)v.zoom=cl(v.zoom*d1/d0)}
+  ps[e.pointerId]=[e.clientX,e.clientY]};
+ cv.onwheel=function(e){e.preventDefault();v.zoom=cl(v.zoom*(e.deltaY<0?1.1:.9))};
+ window.addEventListener('resize',function(){v.w=0});
+ (function loop(t){if(v.auto&&!Object.keys(ps).length)v.yaw+=.005;draw(t);requestAnimationFrame(loop)})();
+ return v}
+function tools(n){return'<div class="row"><button onclick="'+n+'.zoom=cl('+n+'.zoom*1.25)">🔍＋</button><button onclick="'+n+'.zoom=cl('+n+'.zoom*.8)">🔍－</button><button onclick="'+n+'.auto=!'+n+'.auto">🔄 Tự quay</button><button onclick="'+n+'.yaw=.5;'+n+'.pitch=.35;'+n+'.zoom=1">↺ Đặt lại</button></div>'}
+function tab(i){for(var k=0;k<2;k++){document.getElementById('P'+k).className=k==i?'':'hid';document.getElementById('t'+k).className=k==i?'on':''}}
+// ===== MÔ PHỎNG 1: BỐN BẬC =====
+var N=40,lv=0,op=[1,0,0,0],cur=[],pal=['#ff6b6b','#51cf66','#4dabf7','#da77f2'],cc=['#ff922b','#4dabf7','#69db7c','#da77f2'];
+var OF=[[-60,-40,-30],[60,-40,30],[-30,50,30],[40,50,-30]];
+function T(c,i,l){var x,y,z,t;
+ if(l==0)return[(i-19.5)*9,i%2?4:-4,0];
+ if(l==1){if(i<24){var a=i*.9;return[(i-19.5)*5+26,30*Math.cos(a),30*Math.sin(a)]}var s=Math.floor((i-24)/4),k=(i-24)%4;return[50+(s%2?3-k:k)*12,(k%2)*6,(s-1.5)*16]}
+ t=6.2832*i/(N-1);x=22*(Math.sin(t)+2*Math.sin(2*t));y=22*(Math.cos(t)-2*Math.cos(2*t));z=-22*Math.sin(3*t);
+ if(l==3)return[x*.5+OF[c][0],y*.5+OF[c][1],z*.5+OF[c][2]];return[x,y,z]}
+var DS=[],us={};for(var i=0;i<N;i++)for(var j=i+9;j<N;j++){var A=T(0,i,2),B=T(0,j,2);if(!us[i]&&!us[j]&&DS.length<3&&Math.hypot(A[0]-B[0],A[1]-B[1],A[2]-B[2])<40){DS.push([i,j]);us[i]=us[j]=1}}
+for(var c=0;c<4;c++){cur[c]=[];for(var i=0;i<N;i++){var q=T(0,i,0);cur[c][i]={x:q[0],y:q[1],z:q[2]}}}
+var cap1=['<b>Bậc 1</b>: trình tự các α-amino acid nối bằng <b>liên kết peptide (–CO–NH–)</b>. Mỗi hạt là một gốc amino acid.',
+'<b>Bậc 2</b>: mạch cuộn thành <span style="color:#ff922b">xoắn α-helix</span> và <span style="color:#4dabf7">gấp nếp β-sheet</span>, giữ vững nhờ <b>liên kết hydrogen</b> (nét đứt xanh lá) giữa C=O và N–H.',
+'<b>Bậc 3</b>: cả chuỗi cuộn gập thành hình cầu 3D nhờ tương tác giữa các gốc R (cầu disulfide S–S là nét đứt vàng, liên kết ion, tương tác kị nước).',
+'<b>Bậc 4</b>: nhiều chuỗi polypeptide (mỗi màu là một chuỗi, như hemoglobin có 4 chuỗi) kết hợp thành phân tử protein hoàn chỉnh.'];
+function setLv(l){lv=l;document.getElementById('cap1').innerHTML=cap1[l];[].forEach.call(document.querySelectorAll('#lvb button'),function(b,k){b.className=k==l?'on':''})}
+document.getElementById('lvb').innerHTML=['Bậc 1','Bậc 2','Bậc 3','Bậc 4'].map(function(t,k){return'<button onclick="setLv('+k+')">'+t+'</button>'}).join('');
+function g1(){var b=[],ln=[],i,c;
+ for(c=0;c<4;c++){op[c]+=((c==0||lv==3?1:0)-op[c])*.1;
+  for(i=0;i<N;i++){var q=T(c>0&&lv<3?0:c,i,lv),u=cur[c][i];u.x+=(q[0]-u.x)*.08;u.y+=(q[1]-u.y)*.08;u.z+=(q[2]-u.z)*.08;
+   b.push({x:u.x,y:u.y,z:u.z,r:lv==3?5:6.5,a:op[c],c:lv==1?(i<24?cc[0]:cc[1]):lv==3?cc[c]:pal[i%4]});if(i)ln.push([c*N+i-1,c*N+i,'#ced4da'])}}
+ if(lv==1)for(i=0;i<17;i++)ln.push([i,i+7,'#69db7c',1]);
+ if(lv==2)DS.forEach(function(p){ln.push([p[0],p[1],'#ffd43b',1])});
+ return{b:b,l:ln}}
+var V1=View('c1',g1,true);setLv(0);
+// ===== MÔ PHỎNG 3: DẠNG SỢI / DẠNG CẦU =====
+var md=0,c3=[],cap3=['<b>Dạng sợi</b> (keratin ở tóc, móng; collagen ở da, gân; fibroin ở tơ tằm): nhiều chuỗi xoắn bện vào nhau như sợi dây thừng, <b>không tan trong nước</b>.','<b>Dạng cầu</b> (albumin lòng trắng trứng, hemoglobin): chuỗi cuộn thành khối cầu, <b>tan trong nước tạo dung dịch keo</b>.'];
+function T3(k,m){if(m==0){var s=Math.floor(k/30),i=k%30,a=i*.45+s*2.094;return[(i-14.5)*8,13*Math.cos(a),13*Math.sin(a)]}
+ var t=6.2832*k/89;return[25*(Math.sin(t)+2*Math.sin(2*t)),25*(Math.cos(t)-2*Math.cos(2*t)),-25*Math.sin(3*t)]}
+for(var k=0;k<90;k++){var q=T3(k,0);c3[k]={x:q[0],y:q[1],z:q[2]}}
+function mode(m){md=m;document.getElementById('cap3').innerHTML=cap3[m];document.getElementById('m0').className=m?'':'on';document.getElementById('m1').className=m?'on':''}
+function g3(){var b=[],ln=[];for(var k=0;k<90;k++){var q=T3(k,md),u=c3[k];u.x+=(q[0]-u.x)*.07;u.y+=(q[1]-u.y)*.07;u.z+=(q[2]-u.z)*.07;
+ b.push({x:u.x,y:u.y,z:u.z,r:5,a:1,c:md?'hsl('+(k*4)+',75%,62%)':['#ff6b6b','#ffd43b','#4dabf7'][Math.floor(k/30)]});if(k&&(md||k%30))ln.push([k-1,k,'#ced4da'])}return{b:b,l:ln}}
+var V3=View('c3',g3,true);mode(0);
+// ===== MÔ PHỎNG 2: ĐÔNG TỤ =====
+var d=0,tint=0,msg='',M=10,L=8,tr=document.getElementById('tr'),cube=[];
+function r(n){return Math.abs(Math.sin(n*12.9898)*43758.5453)%1}
+[-1,1].forEach(function(a){[-1,1].forEach(function(b){cube.push([-85,a*65,b*85,85,a*65,b*85],[a*85,-65,b*85,a*85,65,b*85],[a*85,b*65,-85,a*85,b*65,85])})});
+function g2(t){var b=[],ln=[],jit=(tr.value-20)/80*3,p,i,col;
+ var cA=tint?[165,216,255]:[255,255,255];col='rgb('+Math.round(77+(cA[0]-77)*d)+','+Math.round(171+(cA[1]-171)*d)+','+Math.round(247+(cA[2]-247)*d)+')';
+ for(p=0;p<M;p++){var x0=(r(p*3+1)-.5)*130,y0=(r(p*3+2)-.5)*90,z0=(r(p*3+3)-.5)*130,dx=(r(p*5+1)-.5)*30,dy=35+(r(p*5+2)-.5)*14,dz=(r(p*5+3)-.5)*30;
+  for(i=0;i<L;i++){var tt=6.2832*i/7,s=p*L+i,nx=x0+6*(Math.sin(tt)+2*Math.sin(2*tt)),ny=y0+6*(Math.cos(tt)-2*Math.cos(2*tt)),nz=z0-6*Math.sin(3*tt),
+    ux=dx+(i-3.5)*8+(r(p*11+i)-.5)*14,uy=dy+(r(p*13+i)-.5)*14,uz=dz+(r(p*17+i)-.5)*14;
+   b.push({x:nx+(ux-nx)*d+Math.sin(t*.01+s)*jit,y:ny+(uy-ny)*d+Math.cos(t*.012+s)*jit,z:nz+(uz-nz)*d+Math.sin(t*.011+s*2)*jit,r:5,a:1,c:col});if(i)ln.push([s-1,s,'#adb5bd'])}}
+ document.getElementById('cap2').innerHTML=msg||(d<.3?'Protein còn nguyên: các phân tử cầu (cấu trúc bậc 3 nguyên vẹn) phân tán đều trong dung dịch.':d<1?'Cấu trúc bậc 2, 3 đang bị phá vỡ, các mạch duỗi ra và bắt đầu kết lại.':'<b>Protein đã đông tụ</b>: các mạch duỗi ra, quấn vào nhau thành khối và <b>không trở lại</b> như cũ dù làm nguội.');
+ return{b:b,l:ln,e:cube}}
+tr.oninput=function(){document.getElementById('tv').textContent=tr.value;msg='';d=Math.max(d,Math.min(1,(tr.value-55)/15))};
+function ag(a){if(a=='H2O')msg='Thêm nước cất chỉ làm loãng dung dịch, protein không đông tụ.';else{d=1;msg=a=='HCl'?'Acid làm protein đông tụ (không cần đun nóng).':'Muối kim loại nặng làm protein đông tụ, đây là lí do kim loại nặng gây độc.';if(a=='Cu')tint=1}}
+function rs2(){d=0;tint=0;msg='';tr.value=20;document.getElementById('tv').textContent=20}
+var V2=View('c2',g2,true);
+document.querySelectorAll('[data-t]').forEach(function(e){e.innerHTML=tools(e.dataset.t)});
+// ===== MÔ PHỎNG KHÁI NIỆM 3D: NỐI AMINO ACID =====
+var AA=['Gly','Ala','Val','Ser','Cys','Phe','Lys','Glu'],AC=['#ff6b6b','#51cf66','#4dabf7','#da77f2','#ffd43b','#ff922b','#38d9a9','#f783ac'],na=1,heme=false,RO=[],WT=[];
+function sx(i){return i*60-((na-1)*60+52)/2}
+function addAA(){if(na>=8)return;na++;RO[na-1]={x:sx(na-1)+170,y:-10,z:70};WT.push({i:na-1,y:0});cap0()}
+function rst(){na=1;RO=[{x:sx(0),y:0,z:0}];WT=[]}
+function cap0(){var n=na,nm=n==1?'1 amino acid đơn lẻ':n==2?'đipeptit':n==3?'tripeptit':'peptide ngắn';
+ document.getElementById('cap0').innerHTML='Số gốc amino acid: <b>'+n+'</b> · liên kết peptide (đỏ): <b>'+(n-1)+'</b> · H₂O tách ra: <b>'+(n-1)+'</b> → <b>'+nm+'</b>.'+(n>1?'<br>Liên kết peptide nối <b>C (của nhóm –CO–)</b> gốc trước với <b>N (của nhóm –NH–)</b> gốc sau, tạo nhóm <b>–CO–NH–</b>; nhóm –OH của COOH kết hợp H của NH₂ tạo H₂O.':'')+(n==8?'<br>Chuỗi dài hàng trăm gốc như vậy gọi là <b>polypeptide</b> (protein).':'')+
+ (heme?'<br>Nhóm heme <b>không phải amino acid</b> (thành phần phi protein) → protein có thêm nhóm này là <b>protein phức tạp</b>; protein chỉ gồm α-amino acid là <b>protein đơn giản</b>.':'')}
+function g0(){var b=[],l=[],tg=[],i,pc=-1,P=function(x,y,z,r,c){b.push({x:x,y:y,z:z,r:r,a:1,c:c});return b.length-1};
+ for(i=0;i<na;i++){var o=RO[i];o.x+=(sx(i)-o.x)*.07;o.y+=(0-o.y)*.07;o.z+=(0-o.z)*.07;
+  var X=o.x,Y=o.y,Z=o.z,Nn=P(X,Y,Z,8,'#4dabf7'),Ca=P(X+20,Y-14,Z,8,'#adb5bd'),Cc=P(X+40,Y,Z,8,'#adb5bd'),Ox=P(X+46,Y+18,Z+14,7,'#ff6b6b'),H1=P(X-6,Y+16,Z-8,4.5,'#f8f9fa'),Ha=P(X+20,Y-22,Z-14,4.5,'#f8f9fa'),R=P(X+20,Y-36,Z+12,10,AC[i]);
+  l.push([Nn,Ca,'#ced4da'],[Ca,Cc,'#ced4da'],[Cc,Ox,'#ff8787'],[Nn,H1,'#ced4da'],[Ca,Ha,'#ced4da'],[Ca,R,AC[i]]);
+  if(i==0){var H2=P(X-6,Y+16,Z+8,4.5,'#f8f9fa');l.push([Nn,H2,'#ced4da']);tg.push([X-14,Y+32,Z,'H₂N','#74c0fc'])}
+  if(i==na-1){var Oh=P(X+52,Y+16,Z-12,7,'#ff6b6b'),Hh=P(X+62,Y+22,Z-18,4.5,'#f8f9fa');l.push([Cc,Oh,'#ced4da'],[Oh,Hh,'#ced4da']);tg.push([X+62,Y+36,Z-12,'COOH','#ff8787'])}
+  tg.push([X+20,Y-54,Z+12,AA[i],AC[i]]);
+  if(pc>=0){l.push([pc,Nn,'#ff2d2d',0,9]);tg.push([(b[pc].x+X)/2,Y+36,Z+10,'CO–NH','#ff6b6b'])}
+  pc=Cc}
+ WT.forEach(function(w){var xm=(RO[w.i-1].x+40+RO[w.i].x)/2;w.y+=(-85-w.y)*.04;
+  var a=P(xm,w.y,0,6,'#ff6b6b'),h1=P(xm-8,w.y-6,6,4,'#f8f9fa'),h2=P(xm+8,w.y-6,-6,4,'#f8f9fa');l.push([a,h1,'#ced4da'],[a,h2,'#ced4da']);tg.push([xm,w.y-18,0,'H₂O','#74c0fc'])});
+ if(heme){var f=P(0,100,0,9,'#f08c00'),k,pr0=-1,r0;for(k=0;k<8;k++){var q=k*.7854,rr=P(24*Math.cos(q),100,24*Math.sin(q),5.5,'#e03131');if(k%2==0)l.push([f,rr,'#f08c00']);if(k)l.push([pr0,rr,'#e03131']);else r0=rr;pr0=rr}l.push([pr0,r0,'#e03131']);tg.push([0,128,0,'nhóm heme (Fe)','#ffa94d'])}
+ return{b:b,l:l,tx:tg}}
+rst();var V0=View('c0',g0,true);cap0();
+// ===== ĐIỀN KHUYẾT =====
+var FB='Protein là những {1} cao phân tử, phân tử khối từ vài chục nghìn đến vài triệu amu, được tạo nên từ nhiều gốc {2} liên kết với nhau bằng liên kết {3} có dạng –{4}–. Khi hai amino acid kết hợp với nhau, tách ra 1 phân tử {5}. Phân tử có n gốc amino acid thì có {6} liên kết peptide. Protein {7} chỉ gồm các α-amino acid (vd: albumin, fibroin); protein {8} có thêm thành phần phi protein (vd: hemoglobin chứa nhóm heme).';
+var FA=[['polipeptit','polipeptid','polypeptide'],['aminoacid','αaminoacid','aaminoacid','alphaaminoacid','aminoaxit','αaminoaxit'],['peptit','peptide'],['conh'],['nuoc','h2o','ho'],['n1'],['dongian'],['phuctap']],
+FS=['polypeptide','α-amino acid','peptide','CO–NH','nước (H₂O)','n − 1','đơn giản','phức tạp'];
+function nm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9α]/g,'')}
+function mkFb(){document.getElementById('fb').innerHTML=FB.replace(/\{(\d)\}/g,function(m,k){return'<input class="blank" type="text" id="b'+k+'" autocomplete="off">'});document.getElementById('fbs').textContent='';
+ document.getElementById('bank').innerHTML='<b>Gợi ý:</b> '+['phức tạp','peptide','n − 1','nước (H₂O)','polypeptide','CO–NH','đơn giản','α-amino acid'].map(function(w){return'<span>'+w+'</span>'}).join('')}
+function chkFb(){var g=0;FA.forEach(function(a,k){var e=document.getElementById('b'+(k+1)),ok=a.indexOf(nm(e.value))>-1;e.className='blank '+(ok?'ok':'no');g+=ok});
+ document.getElementById('fbs').textContent='Đúng '+g+'/8 chỗ trống ('+(10*g/8).toFixed(1)+'/10 điểm). '+(g==8?'Chính xác! 🎉':'Các ô đỏ chưa đúng, hãy xem lại mô phỏng và sửa.')}
+function showFb(){FS.forEach(function(s,k){var e=document.getElementById('b'+(k+1));e.value=s;e.className='blank ok'})}
+mkFb();
+// ===== CÂU HỎI =====
+var Q=[[
+{t:'1. Protein là:',o:['Hợp chất có phân tử khối nhỏ chứa nhóm –COOH','Polypeptide cao phân tử tạo từ các α-amino acid','Polymer của glucose','Ester của glycerol và acid béo'],a:[1],e:'Protein là polypeptide cao phân tử, đơn vị cấu tạo là α-amino acid.'},
+{t:'2. Liên kết peptide có dạng:',o:['–CO–NH–','–CO–O–','–NH–CH₂–','–C=C–'],a:[0],e:'Giữa –COOH của amino acid này và –NH₂ của amino acid kia, tách 1 phân tử H₂O.'},
+{t:'3. Từ 3 α-amino acid khác nhau (Gly, Ala, Val) tạo tối đa bao nhiêu tripeptide chứa đủ 3 gốc?',o:['3','4','6','9'],a:[2],e:'3! = 6.'},
+{t:'4. Quan sát mô hình bậc 2: cấu trúc xoắn α-helix và gấp nếp β-sheet giữ vững nhờ:',o:['Liên kết ion','Liên kết hydrogen','Liên kết đôi C=C','Liên kết kim loại'],a:[1],e:'Liên kết hydrogen giữa nhóm C=O và N–H của mạch chính (nét đứt xanh lá).'},
+{t:'5. Chọn các phát biểu ĐÚNG:',o:['Bậc 1 là trình tự các α-amino acid','Bậc 2 gồm xoắn α-helix và gấp nếp β-sheet','Bậc 3 là hình dạng không gian 3D của một chuỗi polypeptide','Bậc 4 chỉ có ở protein gồm đúng 1 chuỗi polypeptide'],a:[0,1,2],e:'Bậc 4 là sự kết hợp của nhiều chuỗi polypeptide.'},
+{t:'6. Hemoglobin gồm 4 chuỗi polypeptide và nhóm heme. Hemoglobin là:',o:['Protein đơn giản, cấu trúc bậc 3','Protein phức tạp, có cấu trúc bậc 4','Amino acid','Peptide'],a:[1],e:'Có thành phần phi protein (heme) nên là protein phức tạp; 4 chuỗi nên có cấu trúc bậc 4.'}],[
+{t:'1. Chọn các protein dạng sợi, không tan trong nước:',o:['Keratin (tóc, móng)','Collagen (da, gân)','Fibroin (tơ tằm)','Albumin (lòng trắng trứng)'],a:[0,1,2],e:'Albumin là dạng cầu.'},
+{t:'2. Protein dạng cầu (albumin, hemoglobin) hòa tan trong nước tạo thành:',o:['Dung dịch thật','Dung dịch keo','Kết tủa','Hỗn hợp phân lớp'],a:[1],e:'Phân tử protein rất lớn nên tạo dung dịch keo.'},
+{t:'3. Theo mô phỏng, protein đông tụ khi:',o:['Đun nóng','Thêm dung dịch HCl','Thêm muối CuSO₄','Thêm nước cất'],a:[0,1,2],e:'Thêm nước cất chỉ làm loãng.'},
+{t:'4. Kéo nhiệt độ về 20 °C sau khi protein đã đông tụ, quan sát thấy:',o:['Protein trở lại trạng thái ban đầu','Protein vẫn đông tụ, quá trình không thuận nghịch','Protein tan hết','Protein biến thành amino acid'],a:[1],e:'Cấu trúc bậc 2, 3 bị phá vỡ vĩnh viễn.'},
+{t:'5. Riêu cua nổi lên thành mảng khi đun nước cua là do:',o:['Chất béo nổi','Protein đông tụ khi đun nóng','Tinh bột hồ hóa','Muối kết tinh'],a:[1],e:'Protein trong cua đông tụ ở nhiệt độ cao.'},
+{t:'6. Vì sao các muối kim loại nặng (Pb²⁺, Hg²⁺, Cu²⁺) gây độc cho cơ thể?',o:['Làm protein trong tế bào bị đông tụ, mất chức năng','Làm tăng lượng nước trong cơ thể','Biến protein thành tinh bột','Không gây tác hại gì'],a:[0],e:'Kim loại nặng phá vỡ cấu trúc protein của enzyme, tế bào.'},
+{t:'7. Vận dụng: Giải thích vì sao trứng chiên chuyển từ lỏng sang đặc và không trở lại lỏng khi nguội.',open:1,e:'Nhiệt phá vỡ cấu trúc bậc 2, 3 của albumin, các mạch kết lại thành khối, quá trình không thuận nghịch.'}]];
+Q.forEach(function(qs,s){document.getElementById('qs'+s).innerHTML=qs.map(function(q,j){var h='<div class="q" id="q'+s+'_'+j+'" style="margin-bottom:12px"><p>'+q.t+'</p>';
+ if(q.open)h+='<textarea rows="3" placeholder="Em viết câu trả lời..."></textarea>';else q.o.forEach(function(o){h+='<label><input type="'+(q.a.length>1?'checkbox':'radio')+'" name="q'+s+'_'+j+'"> '+o+'</label>'});
+ return h+'<div class="ex">💡 '+q.e+'</div></div>'}).join('')});
+function grade(s){var g=0,n=0;Q[s].forEach(function(q,j){var el=document.getElementById('q'+s+'_'+j);el.className='q done';if(q.open)return;n++;var ok=1;
+ [].forEach.call(el.querySelectorAll('label'),function(l,k){var c=l.firstChild.checked,rr=q.a.indexOf(k)>-1;if(rr)l.className='ok';else if(c)l.className='no';if(c!=rr)ok=0});g+=ok});
+ document.getElementById('sc'+s).textContent='Kết quả: '+g+'/'+n+' câu đúng ('+(10*g/n).toFixed(1)+'/10) – '+(document.getElementById('hn').value||'…')+' – '+(document.getElementById('lp').value||'…')+'. Câu tự luận do giáo viên chấm.'}
+</script></body></html>
